@@ -1,0 +1,1 @@
+This repository is for turning the responses to a google form sign-up sheet into a better format for an email list for the MSEP Water Quality Working Group.
