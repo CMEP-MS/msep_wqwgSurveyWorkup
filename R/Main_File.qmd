@@ -1,0 +1,186 @@
+---
+title: "Main File"
+format: html
+date: today
+---
+
+```{r}
+library(tidyverse)
+library(readxl)
+# library(gt)
+library(tinytable)
+
+source(here::here("R", "definitions.R"))
+
+in_file <- here::here("input",
+                      "2026-02-06 MSEP WQ Working Group Interest (Responses).xlsx")
+```
+
+```{r}
+dat_in <- read_xlsx(in_file)
+
+# general tidying
+dat <- dat_in |> 
+    select(-Timestamp) |> 
+    rename_with(~ name_map[.x], .cols = any_of(names(name_map))) |> 
+    mutate(Participation = define_participation(Participation),
+           Organization_general = simplify_organization(Organization),
+           Techniques = str_remove_all(Techniques, " \\([^)]*\\)"),
+           Involvement = str_remove_all(Involvement, " \\([^)]*\\)"),
+           Topics = str_remove_all(Topics, " \\(e.g. CDOM, TSS, Turbidity\\)"))
+
+
+
+# split into different 'response variables' of interest
+dat_involvement <- dat |> 
+    select(Name, Organization, Involvement) |> 
+    mutate(Involvement = str_split(Involvement, 
+                                   paste0("(?<=", paste(categories_involvement, collapse = "|"), "), "))) %>%
+    unnest(Involvement)
+
+
+dat_techniques <- dat |> 
+    select(Name, Organization, Techniques) |> 
+    mutate(Techniques = str_split(Techniques, 
+                                   paste0("(?<=", paste(categories_techniques, collapse = "|"), "), "))) %>%
+    unnest(Techniques)
+
+
+dat_topics <- dat |> 
+    select(Name, Organization, Topics) |> 
+    mutate(Topics = str_split(Topics, 
+                                   paste0("(?<=", paste(str_escape(categories_topics), collapse = "|"), "), "))) %>%
+    unnest(Topics) |> 
+    mutate(Topics = case_when(Topics == "pH/Ocean acificiation" ~ "pH/Ocean acidification",
+                              .default = Topics))
+```
+
+```{r}
+# summarize data frames by variables of interest
+summ_involvement <- summarize_categories(dat_involvement, Involvement, categories_involvement)
+
+summ_techniques <- summarize_categories(dat_techniques, Techniques, categories_techniques)
+
+summ_topics <- summarize_categories(dat_topics, Topics, categories_topics)
+
+
+# summarize by how many choices each user checked
+users_involvement <- dat_involvement |> 
+    summarize(.by = Name,
+              n_choices = n()) |> 
+    count(n_choices) |> 
+    rename(`# selections` = n_choices)
+
+users_techniques <- dat_techniques |> 
+    summarize(.by = Name,
+              n_choices = n()) |> 
+    count(n_choices) |> 
+    rename(`# selections` = n_choices)
+
+users_topics <- dat_topics |> 
+    summarize(.by = Name,
+              n_choices = n()) |> 
+    count(n_choices) |> 
+    rename(`# selections` = n_choices)
+```
+
+```{r}
+# get information about all the "Other" selections
+other_involvement <- dat_involvement |> 
+    filter(!(Involvement %in% categories_involvement))
+
+other_techniques <- dat_techniques |> 
+    filter(!(Techniques %in% categories_techniques))
+
+other_topics <- dat_topics |> 
+    filter(!(Topics %in% categories_topics))
+```
+
+
+## Summaries of roles and interests  
+
+### What's your role?  
+
+#### How many boxes did each person check?  
+
+```{r}
+tt(users_involvement) |> 
+    style_tt(i = 0,
+             bold = TRUE) |> 
+    style_tt(i = 1,
+             background = "teal",
+             color = "white",
+             bold = TRUE)
+```
+
+
+#### What were the selections?  
+
+```{r}
+tt(summ_involvement) |> 
+    style_tt(i = 0,
+             bold = TRUE)
+```
+
+The 'Other' answers included:  
+
+-  Coordinating collaborations/Running working groups (2)  
+-  Laboratory work (2)
+-  WQ Assessment
+-  Extension  
+-  Water Resource Planning  
+-  Work with seabirds  
+
+
+### What techniques do you use?  
+
+#### How many boxes did each person check?  
+
+```{r}
+tt(users_techniques) |> 
+    style_tt(i = 0,
+             bold = TRUE)
+```
+
+
+#### What were the selections?  
+
+```{r}
+tt(summ_techniques) |> 
+    style_tt(i = 0,
+             bold = TRUE)
+```
+
+The 'Other' category included:  
+
+-  Volunteer monitoring (2)  
+-  Fecal coliform and algae identification and enumeration  
+-  Restoration and nutrient reduction  
+-  left blank (3)  
+
+
+
+### What topics do you work with?  
+
+#### How many boxes did each person check?  
+
+```{r}
+tt(users_topics) |> 
+    style_tt(i = 0,
+             bold = TRUE)
+```
+
+
+#### What were the selections?  
+
+```{r}
+tt(summ_topics) |> 
+    style_tt(i = 0,
+             bold = TRUE)
+```
+
+The 'Other' category included:  
+
+-  SAV  
+
+
