@@ -1,6 +1,12 @@
 ---
 title: "Main File"
-format: html
+format: 
+    html:
+        toc: true
+        embed-resources: true
+        warning: false
+        message: false
+        echo: false
 date: today
 ---
 
@@ -14,7 +20,110 @@ source(here::here("R", "definitions.R"))
 
 in_file <- here::here("input",
                       "2026-02-06 MSEP WQ Working Group Interest (Responses).xlsx")
+
+
 ```
+
+
+```{r}
+#| label: green highlighting
+#| eval: false
+
+# darkest first
+colorpal <- rev(RColorBrewer::brewer.pal(9, "YlGnBu"))
+# colorpal <- rev(khroma::color("YlOrBr")(9))
+
+# header
+color_colnames <- colorpal[2]
+
+# background and colors 1
+color_background1 <- colorpal[8]
+color_text1 <- colorpal[3]
+
+# background and colors 2
+color_background2 <- colorpal[7]
+color_text2 <- colorpal[3]
+```
+
+
+```{r}
+#| label: yellow-orange highlighting
+#| eval: false
+
+# yellows: lightest first
+yellows <- khroma::color("YlOrBr")(9)
+# blues: darkest first
+blues <- rev(RColorBrewer::brewer.pal(9, "Blues"))
+
+# header
+color_colnames <- blues[1]
+
+# background and colors 1
+color_background1 <- yellows[2]
+color_text1 <- blues[2]
+
+# background and colors 2
+color_background2 <- yellows[3]
+color_text2 <- blues[2]
+```
+
+```{r}
+#| label: yellow-orange highlighting-difftext
+#| eval: false
+
+
+# yellows: lightest first
+yellows <- khroma::color("YlOrBr")(9)
+# blue/brownish stuff: darkest first
+blues <- rev(RColorBrewer::brewer.pal(11, "RdBu"))
+
+# header
+color_colnames <- blues[1]
+# color_colnames <- "#225555"
+
+# background and colors 1
+color_background1 <- yellows[2]
+color_text1 <- blues[10]
+
+# background and colors 2
+color_background2 <- yellows[3]
+color_text2 <- blues[11]
+```
+
+```{r}
+#| label: yellow-orange highlighting-msepcols
+
+
+# yellows: lightest first
+yellows <- khroma::color("YlOrBr")(9)
+
+# header
+color_colnames <- "#20434a"
+# color_colnames <- "#225555"
+
+# background and colors 1
+color_background1 <- yellows[2]
+color_text1 <- "#20434a"
+
+# background and colors 2
+color_background2 <- yellows[3]
+color_text2 <- "#20434a"
+```
+
+```{r}
+# set up tinytable to make things a little easier
+my_tt <- function(data){
+    tt(data) |> 
+        style_tt(i = 0,
+                 color = color_colnames,
+                 bold = TRUE) |> 
+        style_tt(j = 1,
+                 align = "l") |> 
+        style_tt(j = 2,
+                 align = "r")
+}
+```
+
 
 ```{r}
 dat_in <- read_xlsx(in_file)
@@ -57,11 +166,14 @@ dat_topics <- dat |>
 
 ```{r}
 # summarize data frames by variables of interest
-summ_involvement <- summarize_categories(dat_involvement, Involvement, categories_involvement)
+summ_involvement <- summarize_categories(dat_involvement, Involvement, categories_involvement) |> 
+    rename(Count = n)
 
-summ_techniques <- summarize_categories(dat_techniques, Techniques, categories_techniques)
+summ_techniques <- summarize_categories(dat_techniques, Techniques, categories_techniques) |> 
+    rename(Count = n)
 
-summ_topics <- summarize_categories(dat_topics, Topics, categories_topics)
+summ_topics <- summarize_categories(dat_topics, Topics, categories_topics) |> 
+    rename(Count = n)
 
 
 # summarize by how many choices each user checked
@@ -69,19 +181,22 @@ users_involvement <- dat_involvement |>
     summarize(.by = Name,
               n_choices = n()) |> 
     count(n_choices) |> 
-    rename(`# selections` = n_choices)
+    rename(`# Selected` = n_choices,
+           Count = n)
 
 users_techniques <- dat_techniques |> 
     summarize(.by = Name,
               n_choices = n()) |> 
     count(n_choices) |> 
-    rename(`# selections` = n_choices)
+    rename(`# Selected` = n_choices,
+           Count = n)
 
 users_topics <- dat_topics |> 
     summarize(.by = Name,
               n_choices = n()) |> 
     count(n_choices) |> 
-    rename(`# selections` = n_choices)
+    rename(`# Selected` = n_choices,
+           Count = n)
 ```
 
 ```{r}
@@ -104,22 +219,34 @@ other_topics <- dat_topics |>
 #### How many boxes did each person check?  
 
 ```{r}
-tt(users_involvement) |> 
-    style_tt(i = 0,
-             bold = TRUE) |> 
+t <- my_tt(users_involvement)
+t
+```
+
+```{r}
+t2 <- t |> 
     style_tt(i = 1,
-             background = "teal",
-             color = "white",
+             background = color_background1,
+             color = color_text1,
              bold = TRUE)
+t2
 ```
 
 
 #### What were the selections?  
 
 ```{r}
-tt(summ_involvement) |> 
-    style_tt(i = 0,
-             bold = TRUE)
+t <- my_tt(summ_involvement)
+t
+```
+
+```{r}
+t2 <- t |> 
+    style_tt(i = 1,
+             background = color_background1,
+             color = color_text1,
+             bold = TRUE) 
+t2
 ```
 
 The 'Other' answers included:  
@@ -131,24 +258,60 @@ The 'Other' answers included:
 -  Water Resource Planning  
 -  Work with seabirds  
 
+***  
+
 
 ### What techniques do you use?  
 
 #### How many boxes did each person check?  
 
 ```{r}
-tt(users_techniques) |> 
-    style_tt(i = 0,
-             bold = TRUE)
+t <- my_tt(users_techniques)
+t
+
+```
+
+```{r}
+t2 <- t |> 
+    style_tt(i = 1:3,
+             background = color_background1,
+             color = color_text1,
+             bold = TRUE) 
+t2
 ```
 
 
 #### What were the selections?  
 
 ```{r}
-tt(summ_techniques) |> 
+t <- tt(summ_techniques) |> 
     style_tt(i = 0,
-             bold = TRUE)
+             color = color_colnames,
+             bold = TRUE) |> 
+    style_tt(j = 1,
+             align = "l") |> 
+    style_tt(j = 2,
+             align = "r")
+
+t
+```
+
+```{r}
+t2 <- t |>  
+    style_tt(i = 1:2,
+             background = color_background1,
+             color = color_text1,
+             bold = TRUE) 
+
+t2
+```
+
+```{r}
+t2 |> 
+    style_tt(i = 3,
+             background = color_background2,
+             color = color_text2,
+             bold = TRUE) 
 ```
 
 The 'Other' category included:  
@@ -158,24 +321,48 @@ The 'Other' category included:
 -  Restoration and nutrient reduction  
 -  left blank (3)  
 
-
+***  
 
 ### What topics do you work with?  
 
 #### How many boxes did each person check?  
 
 ```{r}
-tt(users_topics) |> 
-    style_tt(i = 0,
+t <- my_tt(users_topics)
+t
+```
+
+```{r}
+t2 <- t |> 
+    style_tt(i = c(2, 3, 7),
+             background = color_background1,
+             color = color_text1,
              bold = TRUE)
+t2
 ```
 
 
 #### What were the selections?  
 
 ```{r}
-tt(summ_topics) |> 
-    style_tt(i = 0,
+t <- my_tt(summ_topics)
+t
+```
+
+```{r}
+t2 <- t |> 
+    style_tt(i = 1:6,
+             background = color_background1,
+             color = color_text1,
+             bold = TRUE) 
+t2
+```
+
+```{r}
+t2 |> 
+    style_tt(i = 7:10,
+             background = color_background2,
+             color = color_text2,
              bold = TRUE)
 ```
 
