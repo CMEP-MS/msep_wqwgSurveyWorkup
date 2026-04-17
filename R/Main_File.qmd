@@ -1,6 +1,7 @@
 ---
-title: "MSEP Water Quality Working Group survey responses"
+title: "MSEP Water Quality Working Group survey responses: Summary of goals and interests"
 format: 
+    revealjs: default
     html:
         toc: true
         embed-resources: true
@@ -19,10 +20,11 @@ library(tinytable)
 source(here::here("R", "definitions.R"))
 
 in_file <- here::here("input",
-                      "2026-02-06 MSEP WQ Working Group Interest (Responses).xlsx")
+                      "2026-04-17 MSEP WQ Working Group Interest (Responses).xlsx")
 
 
 ```
+
 ```{r}
 #| label: yellow-orange highlighting-msepcols
 
@@ -143,18 +145,19 @@ other_topics <- dat_topics |>
 ```
 
 
-## Summaries of roles and interests  
+# What's your role?   
 
-### What's your role?  
-
-#### How many boxes did each person check?  
+## Role: How many boxes did each person check?  
 
 ```{r}
 t <- my_tt(users_involvement) |> 
             style_tt(j = 1,
                  align = "c")  
+
 t
 ```
+
+## Role: How many boxes did each person check?  
 
 ```{r}
 t2 <- t |> 
@@ -166,14 +169,17 @@ t2
 ```
 
 
-#### What were the selections?  
+## Role: What were the selections?  
 
 ```{r}
 t <- my_tt(summ_involvement) |> 
             style_tt(j = 1,
                  align = "l") 
+
 t
 ```
+
+## Role: What were the selections?  
 
 ```{r}
 t2 <- t |> 
@@ -184,6 +190,8 @@ t2 <- t |>
 t2
 ```
 
+## Role: What were the selections?  
+
 The 'Other' answers included:  
 
 -  Coordinating collaborations/Running working groups (2)  
@@ -193,20 +201,20 @@ The 'Other' answers included:
 -  Water Resource Planning  
 -  Work with seabirds  
 
-***  
 
+# What techniques do you use?  
 
-### What techniques do you use?  
-
-#### How many boxes did each person check?  
+## Techniques: How many boxes did each person check?  
 
 ```{r}
 t <- my_tt(users_techniques) |> 
             style_tt(j = 1,
-                 align = "c") 
-t
+                 align = "c")
 
+t
 ```
+
+## Techniques: How many boxes did each person check?  
 
 ```{r}
 t2 <- t |> 
@@ -218,7 +226,7 @@ t2
 ```
 
 
-#### What were the selections?  
+## Techniques: What were the selections? 
 
 ```{r}
 t <- my_tt(summ_techniques) |> 
@@ -227,6 +235,8 @@ t <- my_tt(summ_techniques) |>
 
 t
 ```
+
+## Techniques: What were the selections?  
 
 ```{r}
 t2 <- t |>  
@@ -238,13 +248,17 @@ t2 <- t |>
 t2
 ```
 
+## Techniques: What were the selections?  
+
 ```{r}
 t2 |> 
-    style_tt(i = 3,
+    style_tt(i = 3:5,
              background = color_background2,
              color = color_text2,
              bold = TRUE) 
 ```
+
+## Techniques: What were the selections?  
 
 The 'Other' category included:  
 
@@ -253,11 +267,10 @@ The 'Other' category included:
 -  Restoration and nutrient reduction  
 -  left blank (3)  
 
-***  
 
-### What topics do you work with?  
+# What topics do you work with?  
 
-#### How many boxes did each person check?  
+## Topics: How many boxes did each person check?  
 
 ```{r}
 t <- my_tt(users_topics) |> 
@@ -266,9 +279,11 @@ t <- my_tt(users_topics) |>
 t
 ```
 
+## Topics: How many boxes did each person check?  
+
 ```{r}
 t2 <- t |> 
-    style_tt(i = c(2, 3, 7),
+    style_tt(i = c(2, 3, 5, 7),
              background = color_background1,
              color = color_text1,
              bold = TRUE)
@@ -276,7 +291,7 @@ t2
 ```
 
 
-#### What were the selections?  
+## Topics: What were the selections?  
 
 ```{r}
 t <- my_tt(summ_topics) |> 
@@ -284,6 +299,8 @@ t <- my_tt(summ_topics) |>
                  align = "l") 
 t
 ```
+
+## Topics: What were the selections?  
 
 ```{r}
 t2 <- t |> 
@@ -294,6 +311,8 @@ t2 <- t |>
 t2
 ```
 
+## Topics: What were the selections?  
+
 ```{r}
 t2 |> 
     style_tt(i = 7:10,
@@ -301,6 +320,8 @@ t2 |>
              color = color_text2,
              bold = TRUE)
 ```
+
+## Topics: What were the selections?  
 
 The 'Other' category included:  
 
